@@ -1,0 +1,34 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e27]:
+    - generic [ref=e28]:
+      - heading "Choose a Mode" [level=1] [ref=e29]
+      - paragraph [ref=e30]: What would you like to work on together?
+    - generic [ref=e31]:
+      - button "💬 Check In Share what's on your mind and feel heard" [ref=e32]:
+        - generic [ref=e33]: 💬
+        - generic [ref=e34]:
+          - heading "Check In" [level=3] [ref=e35]
+          - paragraph [ref=e36]: Share what's on your mind and feel heard
+      - button "💛 Appreciate Express gratitude for something specific" [ref=e37]:
+        - generic [ref=e38]: 💛
+        - generic [ref=e39]:
+          - heading "Appreciate" [level=3] [ref=e40]
+          - paragraph [ref=e41]: Express gratitude for something specific
+      - button "🤝 Raise a Concern Express a feeling constructively using 'I' statements" [ref=e42]:
+        - generic [ref=e43]: 🤝
+        - generic [ref=e44]:
+          - heading "Raise a Concern" [level=3] [ref=e45]
+          - paragraph [ref=e46]: Express a feeling constructively using 'I' statements
+      - button "🔄 Work Through It Process a disagreement with structured dialogue" [ref=e47]:
+        - generic [ref=e48]: 🔄
+        - generic [ref=e49]:
+          - heading "Work Through It" [level=3] [ref=e50]
+          - paragraph [ref=e51]: Process a disagreement with structured dialogue
+      - button "🌱 Repair Process what happened after a conflict" [ref=e52]:
+        - generic [ref=e53]: 🌱
+        - generic [ref=e54]:
+          - heading "Repair" [level=3] [ref=e55]
+          - paragraph [ref=e56]: Process what happened after a conflict
+  - button "Open Next.js Dev Tools" [ref=e14] [cursor=pointer]:
+    - img [ref=e15]
+  - alert [ref=e18]

@@ -1,0 +1,22 @@
+- generic [ref=e1]:
+  - generic [ref=e27]:
+    - generic [ref=e28]:
+      - heading "Reflect what you heard" [level=1] [ref=e29]
+      - paragraph [ref=e30]: Paraphrase your partner's concern in your own words
+    - generic [ref=e31]:
+      - paragraph [ref=e32]: "Your partner said:"
+      - paragraph [ref=e33]:
+        - text: "\"I feel"
+        - strong [ref=e34]: frustrated
+        - text: when
+        - strong [ref=e35]: plans get cancelled last minute
+        - text: . What I need is
+        - strong [ref=e36]: more advance notice when things change
+        - text: ."
+    - generic [ref=e38]:
+      - generic [ref=e39]: What I hear you saying is...
+      - textbox "Put their concern in your own words" [active] [ref=e40]: You feel frustrated when plans change at the last minute, and you would like more heads up when that happens
+    - button "Send Paraphrase" [ref=e42]
+  - button "Open Next.js Dev Tools" [ref=e14] [cursor=pointer]:
+    - img [ref=e15]
+  - alert [ref=e18]

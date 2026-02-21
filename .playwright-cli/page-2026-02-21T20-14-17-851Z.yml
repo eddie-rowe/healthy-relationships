@@ -1,0 +1,11 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - heading "Healthy Relationships" [level=1] [ref=e4]
+      - paragraph [ref=e5]: A guided space for two people to communicate better, together.
+    - generic [ref=e6]:
+      - button "Start a Session" [ref=e7]
+      - button "Join a Session" [ref=e8]
+  - button "Open Next.js Dev Tools" [ref=e15] [cursor=pointer]:
+    - img [ref=e16]
+  - alert [ref=e9]

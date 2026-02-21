@@ -1,0 +1,18 @@
+- generic [ref=e1]:
+  - generic [ref=e17]:
+    - generic [ref=e18]:
+      - heading "Listen and validate" [level=1] [ref=e19]
+      - paragraph [ref=e20]: Your partner shared what's on their mind
+    - paragraph [ref=e22]: "\"Work has been really stressful this week with the deadline coming up\""
+    - generic [ref=e23]:
+      - button "That sounds really hard" [active] [ref=e24]
+      - button "How are you feeling about that?" [ref=e25]
+      - button "I'm here for you" [ref=e26]
+      - button "That makes sense" [ref=e27]
+      - button "I can see why that would bother you" [ref=e28]
+      - button "Thank you for sharing that with me" [ref=e29]
+      - button "Write my own response..." [ref=e30]
+    - button "Send Response" [ref=e32]
+  - button "Open Next.js Dev Tools" [ref=e12] [cursor=pointer]:
+    - img [ref=e13]
+  - alert [ref=e16]

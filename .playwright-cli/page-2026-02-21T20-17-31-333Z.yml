@@ -1,0 +1,7 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e99]:
+    - heading "Do you feel better?" [level=1] [ref=e100]
+    - paragraph [ref=e105]: Waiting for your partner to respond...
+  - button "Open Next.js Dev Tools" [ref=e15] [cursor=pointer]:
+    - img [ref=e16]
+  - alert [ref=e9]

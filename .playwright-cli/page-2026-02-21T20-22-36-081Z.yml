@@ -1,0 +1,15 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e17]:
+    - generic [ref=e18]:
+      - generic [ref=e19]: 💛
+      - heading "Your partner appreciates you" [level=1] [ref=e20]
+    - paragraph [ref=e22]:
+      - text: "\"I noticed when you"
+      - strong [ref=e23]: made me coffee this morning
+      - text: and it made me feel
+      - strong [ref=e24]: loved and cared for
+      - text: ."
+    - button "Thank You" [ref=e25]
+  - button "Open Next.js Dev Tools" [ref=e12] [cursor=pointer]:
+    - img [ref=e13]
+  - alert [ref=e16]

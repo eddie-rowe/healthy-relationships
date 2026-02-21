@@ -1,0 +1,10 @@
+- generic [ref=e1]:
+  - generic [ref=e33]:
+    - generic [ref=e34]:
+      - heading "What's on your mind?" [level=1] [ref=e35]
+      - paragraph [ref=e36]: Share something from your day — external stress, not about your relationship
+    - textbox "What's been on your mind today..." [active] [ref=e39]: I've been worried about my mom's health
+    - button "Share" [ref=e41]
+  - button "Open Next.js Dev Tools" [ref=e12] [cursor=pointer]:
+    - img [ref=e13]
+  - alert [ref=e16]

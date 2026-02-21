@@ -1,0 +1,10 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e87]:
+    - heading "Do you feel more connected?" [level=1] [ref=e88]
+    - generic [ref=e89]:
+      - button "Yes" [ref=e90]
+      - button "Somewhat" [ref=e91]
+      - button "No" [ref=e92]
+  - button "Open Next.js Dev Tools" [ref=e14] [cursor=pointer]:
+    - img [ref=e15]
+  - alert [ref=e18]

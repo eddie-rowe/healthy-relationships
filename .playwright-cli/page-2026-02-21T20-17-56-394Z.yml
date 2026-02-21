@@ -1,0 +1,26 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e54]:
+    - generic [ref=e55]:
+      - generic [ref=e56]: 🤝
+      - heading "Session Complete" [level=1] [ref=e57]
+      - paragraph [ref=e58]: Raise a Concern
+    - generic [ref=e59]:
+      - generic [ref=e60]:
+        - heading "The concern" [level=3] [ref=e61]
+        - paragraph [ref=e62]: I feel frustrated when plans get cancelled last minute. What I need is more advance notice when things change.
+      - generic [ref=e63]:
+        - heading "Paraphrase" [level=3] [ref=e64]
+        - paragraph [ref=e65]: You feel frustrated when plans change at the last minute, and you would like more heads up when that happens
+      - generic [ref=e66]:
+        - heading "How we feel" [level=3] [ref=e67]
+        - generic [ref=e68]:
+          - generic [ref=e69]:
+            - generic [ref=e70]: Person A
+            - generic [ref=e71]: "Yes"
+          - generic [ref=e72]:
+            - generic [ref=e73]: Person B
+            - generic [ref=e74]: Somewhat
+      - button "Done" [ref=e76]
+  - button "Open Next.js Dev Tools" [ref=e14] [cursor=pointer]:
+    - img [ref=e15]
+  - alert [ref=e18]
