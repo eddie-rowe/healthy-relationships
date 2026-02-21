@@ -8,15 +8,22 @@ interface RoomState {
   listenerId: string | null;
   data: Record<string, unknown>;
   ratings: { speaker: Rating | null; listener: Rating | null };
+  sessionId: string;
+  sessionStartedAt: number | null;
+  stepStartedAt: number | null;
 }
 
 const MODE_STEPS: Record<string, string[]> = {
-  "check-in": ["waiting", "mode-select", "share-a", "validate-a", "share-b", "validate-b", "rating", "results"],
-  "appreciate": ["waiting", "mode-select", "appreciate-a", "acknowledge-a", "appreciate-b", "acknowledge-b", "results"],
-  "raise-concern": ["waiting", "mode-select", "statement", "paraphrase", "confirm", "rating", "results"],
-  "work-through-it": ["waiting", "mode-select", "speak-a", "mirror-a", "validate-a", "empathize-a", "speak-b", "mirror-b", "validate-b", "empathize-b", "rating", "results"],
-  "repair": ["waiting", "mode-select", "feelings", "realities-a", "realities-b", "triggers-a", "triggers-b", "responsibility-a", "responsibility-b", "plan", "rating", "results"],
+  "check-in": ["waiting", "mode-select", "explainer", "share-a", "validate-a", "share-b", "validate-b", "rating", "results"],
+  "appreciate": ["waiting", "mode-select", "explainer", "appreciate-a", "acknowledge-a", "appreciate-b", "acknowledge-b", "results"],
+  "raise-concern": ["waiting", "mode-select", "explainer", "statement", "paraphrase", "confirm", "rating", "results"],
+  "work-through-it": ["waiting", "mode-select", "explainer", "speak-a", "mirror-a", "validate-a", "empathize-a", "speak-b", "mirror-b", "validate-b", "empathize-b", "rating", "results"],
+  "repair": ["waiting", "mode-select", "explainer", "feelings", "realities-a", "realities-b", "triggers-a", "triggers-b", "responsibility-a", "responsibility-b", "plan", "rating", "results"],
 };
+
+function randomSessionId(): string {
+  return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+}
 
 function initialState(): RoomState {
   return {
@@ -26,6 +33,9 @@ function initialState(): RoomState {
     listenerId: null,
     data: {},
     ratings: { speaker: null, listener: null },
+    sessionId: randomSessionId(),
+    sessionStartedAt: null,
+    stepStartedAt: null,
   };
 }
 
@@ -61,12 +71,38 @@ export default class Server implements Party.Server {
     if (!steps) return;
     const currentIndex = steps.indexOf(this.state.step);
     if (currentIndex >= 0 && currentIndex < steps.length - 1) {
+      const prevStep = this.state.step;
       this.state.step = steps[currentIndex + 1];
+      this.emitAnalytics("step_completed", { fromStep: prevStep, toStep: this.state.step });
+      this.state.stepStartedAt = Date.now();
+
+      if (this.state.step === "results") {
+        this.emitAnalytics("session_completed", {
+          ratingsSpeaker: this.state.ratings.speaker,
+          ratingsListener: this.state.ratings.listener,
+        });
+      }
     }
   }
 
   goToStep(step: string) {
     this.state.step = step;
+    this.state.stepStartedAt = Date.now();
+  }
+
+  emitAnalytics(event: string, extra: Record<string, unknown> = {}) {
+    if (process.env.NEXT_PUBLIC_ANALYTICS_ENABLED !== "true") return;
+    console.log(JSON.stringify({
+      event,
+      session_id: this.state.sessionId,
+      mode: this.state.mode,
+      step: this.state.step,
+      timestamp: new Date().toISOString(),
+      duration_seconds: this.state.stepStartedAt
+        ? Math.round((Date.now() - this.state.stepStartedAt) / 1000)
+        : null,
+      ...extra,
+    }));
   }
 
   onConnect(connection: Party.Connection, ctx: Party.ConnectionContext) {
@@ -77,12 +113,10 @@ export default class Server implements Party.Server {
       this.state.speakerId = connection.id;
     } else if (!this.state.listenerId && role === "listener") {
       this.state.listenerId = connection.id;
-      // Both players connected - advance from waiting
       if (this.state.speakerId && this.state.step === "waiting") {
         this.state.step = "mode-select";
       }
     } else if (!this.state.speakerId && !role) {
-      // No role specified, assign speaker
       this.state.speakerId = connection.id;
     } else if (!this.state.listenerId && !role) {
       this.state.listenerId = connection.id;
@@ -90,7 +124,6 @@ export default class Server implements Party.Server {
         this.state.step = "mode-select";
       }
     } else {
-      // Room is full
       connection.send(JSON.stringify({ type: "error", message: "Room is full" }));
       connection.close();
       return;
@@ -100,14 +133,18 @@ export default class Server implements Party.Server {
   }
 
   onClose(connection: Party.Connection) {
-    // Mark the disconnected player
     if (connection.id === this.state.speakerId) {
       this.state.speakerId = null;
+      if (this.state.step !== "waiting" && this.state.step !== "results") {
+        this.emitAnalytics("session_abandoned", { disconnectedRole: "speaker" });
+      }
     } else if (connection.id === this.state.listenerId) {
       this.state.listenerId = null;
+      if (this.state.step !== "waiting" && this.state.step !== "results") {
+        this.emitAnalytics("session_abandoned", { disconnectedRole: "listener" });
+      }
     }
 
-    // If both gone, reset
     if (!this.state.speakerId && !this.state.listenerId) {
       this.state = initialState();
       return;
@@ -131,17 +168,22 @@ export default class Server implements Party.Server {
       case "set-mode":
         this.handleSetMode(data.mode);
         break;
+      case "start-session":
+        this.handleStartSession(sender);
+        break;
       case "submit-step":
         this.handleSubmitStep(data.payload, sender);
         break;
       case "submit-rating":
         this.handleSubmitRating(data.rating, sender);
         break;
+      case "reset-room":
+        this.handleResetRoom();
+        break;
     }
   }
 
   handleJoin(role: Role, sender: Party.Connection) {
-    // Reconnection: if the sender's role slot is empty, reassign
     if (role === "speaker" && !this.state.speakerId) {
       this.state.speakerId = sender.id;
     } else if (role === "listener" && !this.state.listenerId) {
@@ -158,9 +200,37 @@ export default class Server implements Party.Server {
   handleSetMode(mode: Mode) {
     if (this.state.step !== "mode-select") return;
     this.state.mode = mode;
-    const steps = MODE_STEPS[mode];
-    // Go to the first "real" step (after mode-select)
-    this.state.step = steps[2]; // skip "waiting" and "mode-select"
+    // Go to explainer step
+    this.state.step = "explainer";
+    this.state.sessionStartedAt = Date.now();
+    this.state.stepStartedAt = Date.now();
+    this.emitAnalytics("session_started", {});
+    this.broadcastState();
+  }
+
+  handleStartSession(sender: Party.Connection) {
+    // Only the speaker can start from the explainer
+    if (this.state.step !== "explainer") return;
+    if (sender.id !== this.state.speakerId) return;
+    if (!this.state.mode) return;
+
+    const steps = MODE_STEPS[this.state.mode];
+    // First real step is index 3 (after waiting, mode-select, explainer)
+    this.state.step = steps[3];
+    this.state.stepStartedAt = Date.now();
+    this.broadcastState();
+  }
+
+  handleResetRoom() {
+    if (!this.state.mode) return;
+    const speakerId = this.state.speakerId;
+    const listenerId = this.state.listenerId;
+    this.state = initialState();
+    this.state.speakerId = speakerId;
+    this.state.listenerId = listenerId;
+    if (speakerId && listenerId) {
+      this.state.step = "mode-select";
+    }
     this.broadcastState();
   }
 
@@ -246,7 +316,7 @@ export default class Server implements Party.Server {
         this.advanceStep();
       } else {
         this.state.data.confirmResult = "not-quite";
-        // Loop back to statement
+        this.emitAnalytics("not_quite_loop", { step: "confirm" });
         this.goToStep("statement");
       }
     }
@@ -262,10 +332,9 @@ export default class Server implements Party.Server {
     } else if (step === "mirror-a" && senderRole === "listener") {
       if (payload.type === "mirror") {
         this.state.data.mirrorA = payload.text;
-        // Wait for speaker to confirm
         this.state.data.mirrorAConfirmed = null;
         this.broadcastState();
-        return; // Don't advance yet
+        return;
       } else if (payload.type === "confirm") {
         if (payload.accurate) {
           this.state.data.mirrorAConfirmed = true;
@@ -273,25 +342,24 @@ export default class Server implements Party.Server {
         } else {
           this.state.data.mirrorAConfirmed = false;
           this.state.data.mirrorA = null;
-          // Stay on mirror-a for retry
+          this.emitAnalytics("not_quite_loop", { step: "mirror-a" });
         }
         return;
       }
     } else if (step === "mirror-a" && senderRole === "speaker") {
-      // Speaker confirming the mirror
       if (payload.accurate) {
         this.state.data.mirrorAConfirmed = true;
         this.advanceStep();
       } else {
         this.state.data.mirrorAConfirmed = false;
         this.state.data.mirrorA = null;
+        this.emitAnalytics("not_quite_loop", { step: "mirror-a" });
       }
     } else if (step === "validate-a" && senderRole === "listener") {
       this.state.data.validateA = payload.text;
       this.advanceStep();
     } else if (step === "empathize-a" && senderRole === "listener") {
       this.state.data.empathizeA = payload.text;
-      // Wait for speaker to confirm
       this.state.data.empathizeAConfirmed = null;
       this.broadcastState();
       return;
@@ -320,6 +388,7 @@ export default class Server implements Party.Server {
       } else {
         this.state.data.mirrorBConfirmed = false;
         this.state.data.mirrorB = null;
+        this.emitAnalytics("not_quite_loop", { step: "mirror-b" });
       }
     } else if (step === "validate-b" && senderRole === "speaker") {
       this.state.data.validateB = payload.text;
@@ -350,7 +419,6 @@ export default class Server implements Party.Server {
       } else {
         this.state.data.feelingsListener = payload.feelings;
       }
-      // Advance only when both have submitted
       if (this.state.data.feelingsSpeaker && this.state.data.feelingsListener) {
         this.advanceStep();
       }
@@ -395,7 +463,6 @@ export default class Server implements Party.Server {
       this.state.ratings.listener = rating;
     }
 
-    // Advance when both have rated
     if (this.state.ratings.speaker && this.state.ratings.listener) {
       this.advanceStep();
     }

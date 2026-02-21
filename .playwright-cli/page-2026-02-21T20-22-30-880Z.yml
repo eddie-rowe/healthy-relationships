@@ -1,7 +1,0 @@
-- generic [active] [ref=e1]:
-  - generic [ref=e63]:
-    - heading "Your partner is working on their response" [level=2] [ref=e66]
-    - paragraph [ref=e67]: Your partner is reading your appreciation...
-  - button "Open Next.js Dev Tools" [ref=e15] [cursor=pointer]:
-    - img [ref=e16]
-  - alert [ref=e19]

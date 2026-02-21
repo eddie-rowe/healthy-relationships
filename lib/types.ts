@@ -57,4 +57,12 @@ export interface SubmitRatingMessage {
   rating: Rating;
 }
 
-export type ClientMessage = JoinMessage | SetModeMessage | SubmitStepMessage | SubmitRatingMessage;
+export interface StartSessionMessage {
+  type: "start-session";
+}
+
+export interface ResetRoomMessage {
+  type: "reset-room";
+}
+
+export type ClientMessage = JoinMessage | SetModeMessage | SubmitStepMessage | SubmitRatingMessage | StartSessionMessage | ResetRoomMessage;

@@ -17,9 +17,9 @@ export default function Button({
   const base = "rounded-2xl font-semibold transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none";
 
   const variants = {
-    primary: "bg-violet-600 text-white hover:bg-violet-700 active:bg-violet-800",
-    secondary: "bg-violet-100 text-violet-700 hover:bg-violet-200 active:bg-violet-300",
-    ghost: "bg-transparent text-violet-600 hover:bg-violet-50",
+    primary: "bg-violet-600 text-white hover:bg-violet-700 active:bg-violet-800 dark:bg-violet-500 dark:hover:bg-violet-600",
+    secondary: "bg-violet-100 text-violet-700 hover:bg-violet-200 active:bg-violet-300 dark:bg-violet-900 dark:text-violet-300 dark:hover:bg-violet-800",
+    ghost: "bg-transparent text-violet-600 hover:bg-violet-50 dark:text-violet-400 dark:hover:bg-violet-950",
   };
 
   const sizes = {

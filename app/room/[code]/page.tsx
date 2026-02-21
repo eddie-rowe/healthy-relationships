@@ -3,12 +3,16 @@
 import { useSearchParams } from "next/navigation";
 import { use } from "react";
 import RoomProvider, { useRoom } from "@/components/RoomProvider";
-import type { Role } from "@/lib/types";
+import type { Role, Mode } from "@/lib/types";
+import { MODE_CONFIG } from "@/lib/constants";
+import ProgressDots from "@/components/ui/ProgressDots";
+import ScreenTransition from "@/components/ui/ScreenTransition";
 
 // Shared screens
 import WaitingScreen from "@/components/screens/WaitingScreen";
 import WaitingForPartner from "@/components/screens/WaitingForPartner";
 import ModePickerScreen from "@/components/screens/ModePickerScreen";
+import ModeExplainerScreen from "@/components/screens/ModeExplainerScreen";
 import RatingScreen from "@/components/screens/RatingScreen";
 import ResultsScreen from "@/components/screens/ResultsScreen";
 import ErrorScreen from "@/components/screens/ErrorScreen";
@@ -51,6 +55,8 @@ export default function RoomPage({ params }: { params: Promise<{ code: string }>
   );
 }
 
+const PRE_SESSION_STEPS = new Set(["waiting", "mode-select", "explainer", "results"]);
+
 function ScreenRouter({ code }: { code: string }) {
   const { state, yourRole, error } = useRoom();
 
@@ -59,32 +65,73 @@ function ScreenRouter({ code }: { code: string }) {
 
   const { step, mode, data } = state;
 
-  // Pre-mode screens
-  if (step === "waiting") return <WaitingScreen code={code} />;
+  // Pre-mode screens (no progress dots)
+  if (step === "waiting") return <ScreenTransition stepKey="waiting"><WaitingScreen code={code} /></ScreenTransition>;
   if (step === "mode-select") {
-    if (yourRole === "speaker") return <ModePickerScreen />;
-    return <WaitingForPartner message="Your partner is choosing a mode..." />;
+    if (yourRole === "speaker") return <ScreenTransition stepKey="mode-select"><ModePickerScreen /></ScreenTransition>;
+    return <ScreenTransition stepKey="mode-select"><WaitingForPartner message="Your partner is choosing a mode..." /></ScreenTransition>;
+  }
+  if (step === "explainer") {
+    return (
+      <ScreenTransition stepKey="explainer">
+        <ModeExplainerScreen isLeader={yourRole === "speaker"} />
+      </ScreenTransition>
+    );
   }
 
   // Shared post-mode screens
-  if (step === "rating") return <RatingScreen />;
-  if (step === "results") return <ResultsScreen />;
+  if (step === "rating") {
+    return (
+      <WithProgress step={step} mode={mode}>
+        <RatingScreen />
+      </WithProgress>
+    );
+  }
+  if (step === "results") {
+    return <ScreenTransition stepKey="results"><ResultsScreen /></ScreenTransition>;
+  }
 
   // Mode-specific routing
+  let screen: React.ReactNode;
   switch (mode) {
     case "check-in":
-      return renderCheckIn(step, yourRole!, data);
+      screen = renderCheckIn(step, yourRole!, data);
+      break;
     case "appreciate":
-      return renderAppreciate(step, yourRole!, data);
+      screen = renderAppreciate(step, yourRole!, data);
+      break;
     case "raise-concern":
-      return renderRaiseConcern(step, yourRole!, data);
+      screen = renderRaiseConcern(step, yourRole!, data);
+      break;
     case "work-through-it":
-      return renderWorkThroughIt(step, yourRole!, data);
+      screen = renderWorkThroughIt(step, yourRole!, data);
+      break;
     case "repair":
-      return renderRepair(step, yourRole!, data);
+      screen = renderRepair(step, yourRole!, data);
+      break;
     default:
       return <ErrorScreen message="Unknown mode" />;
   }
+
+  return (
+    <WithProgress step={step} mode={mode}>
+      {screen}
+    </WithProgress>
+  );
+}
+
+function WithProgress({ step, mode, children }: { step: string; mode: Mode | null; children: React.ReactNode }) {
+  const modeConfig = mode ? MODE_CONFIG[mode] : null;
+  return (
+    <div className="flex flex-col min-h-screen">
+      {modeConfig && !PRE_SESSION_STEPS.has(step) && (
+        <ProgressDots currentStep={step} totalSteps={modeConfig.steps} />
+      )}
+      <ScreenTransition stepKey={step}>
+        {children}
+      </ScreenTransition>
+    </div>
+  );
 }
 
 // ─── Check In ─────────────────────────────────────────

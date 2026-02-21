@@ -36,7 +36,7 @@ export default function RootLayout({
       <head>
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
-      <body className={`${geistSans.variable} font-sans antialiased bg-violet-50 text-gray-900`}>
+      <body className={`${geistSans.variable} font-sans antialiased bg-violet-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100`}>
         {children}
         <script
           dangerouslySetInnerHTML={{
