@@ -17,8 +17,8 @@ export default function ResponsibilityScreen() {
   return (
     <div className="flex flex-col min-h-screen px-6 py-10">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Take responsibility</h1>
-        <p className="text-gray-500">Name what you contributed to the conflict</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Take responsibility</h1>
+        <p className="text-gray-500 dark:text-gray-400">Name what you contributed to the conflict</p>
       </div>
 
       <div className="flex-1">
@@ -28,6 +28,7 @@ export default function ResponsibilityScreen() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={5}
+          maxLength={300}
         />
       </div>
 

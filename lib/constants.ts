@@ -1,5 +1,60 @@
 import type { Mode, Rating } from "./types";
 
+type WaitingTipKey = `${Mode}:${string}:${"speaker" | "listener"}`;
+export const WAITING_TIPS: Partial<Record<WaitingTipKey, string>> = {
+  // Raise a Concern
+  "raise-concern:statement:listener":
+    "You're about to paraphrase. Listen for three things: the feeling, the situation, and the need. Reflect them back in your own words — don't defend or explain yet.",
+  "raise-concern:paraphrase:speaker":
+    "Your partner is working to understand you. Take a breath — you'll get to confirm whether they got it right.",
+  "raise-concern:confirm:listener":
+    "Your partner is deciding whether your paraphrase felt accurate. If they say 'not quite', just try again — this is a skill, not a test.",
+
+  // Check In
+  "check-in:share-a:listener":
+    "You're about to validate. When your partner shares, your only job is to understand and acknowledge — not to fix, advise, or relate it back to yourself.",
+  "check-in:validate-a:speaker":
+    "Your partner is responding to what you shared. Notice how it feels to be heard.",
+  "check-in:share-b:speaker":
+    "Now it's your turn to listen. Give your partner the same presence they gave you.",
+  "check-in:validate-b:listener":
+    "Your partner is responding to what you shared.",
+
+  // Appreciate
+  "appreciate:appreciate-a:listener":
+    "Your partner is writing an appreciation for you. Receive it openly — let it land without deflecting.",
+  "appreciate:acknowledge-a:speaker":
+    "Your partner is reading your appreciation. Give them a moment to take it in.",
+  "appreciate:appreciate-b:speaker":
+    "Now it's your partner's turn. Think about something specific they've done recently that you're grateful for.",
+
+  // Work Through It
+  "work-through-it:speak-a:listener":
+    "You're about to mirror. Your only goal is to reflect back what you heard — not to respond, argue, or explain your side yet.",
+  "work-through-it:mirror-a:speaker":
+    "Your partner is working to reflect your words. Stay open — they're trying to understand you.",
+  "work-through-it:validate-a:speaker":
+    "Your partner is validating your perspective. You don't need to respond — just notice how it feels to be understood.",
+  "work-through-it:empathize-a:speaker":
+    "Your partner is trying to imagine what you're feeling. Stay curious about their attempt.",
+  "work-through-it:speak-b:speaker":
+    "Now it's your partner's turn to share. Your job is to mirror, validate, and empathize — not defend yourself.",
+
+  // Repair
+  "repair:realities-a:listener":
+    "Your partner is sharing their perspective on what happened. You'll summarize it next — focus on understanding, not rebuttal.",
+  "repair:realities-b:speaker":
+    "Your partner is summarizing your perspective. Notice if they captured how you felt.",
+  "repair:triggers-a:listener":
+    "Your partner is sharing what triggered them. This is about their internal experience — try to receive it without taking it personally.",
+  "repair:responsibility-a:listener":
+    "Your partner is naming what they regret. This is a vulnerable step — receive it with grace.",
+  "repair:plan:speaker":
+    "Your partner is committing to a change. Think about one specific, realistic thing you can do differently.",
+  "repair:plan:listener":
+    "Your partner is committing to a change. Think about one specific, realistic thing you can do differently.",
+};
+
 export const EMOTIONS = [
   "Hurt", "Sad", "Angry", "Frustrated", "Anxious",
   "Scared", "Lonely", "Overwhelmed", "Disappointed", "Confused",

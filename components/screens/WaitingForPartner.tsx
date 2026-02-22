@@ -9,7 +9,7 @@ const MESSAGES = [
   "Being here shows you care.",
 ];
 
-export default function WaitingForPartner({ message }: { message?: string }) {
+export default function WaitingForPartner({ message, tip }: { message?: string; tip?: string }) {
   const [randomMessage] = useState(() => MESSAGES[Math.floor(Math.random() * MESSAGES.length)]);
   const displayMessage = message || randomMessage;
 
@@ -20,6 +20,12 @@ export default function WaitingForPartner({ message }: { message?: string }) {
       </div>
       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Your partner is working on their response</h2>
       <p className="text-gray-500 dark:text-gray-400 max-w-xs">{displayMessage}</p>
+      {tip && (
+        <div className="mt-6 bg-violet-50 dark:bg-violet-950 border border-violet-100 dark:border-violet-900 rounded-2xl p-4 max-w-xs">
+          <p className="text-xs font-semibold text-violet-600 dark:text-violet-400 mb-1">💡 While you wait</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{tip}</p>
+        </div>
+      )}
     </div>
   );
 }

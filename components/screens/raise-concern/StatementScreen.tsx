@@ -9,7 +9,7 @@ import TextArea from "@/components/ui/TextArea";
 const INITIAL_EMOTION_COUNT = 8;
 
 export default function StatementScreen() {
-  const { send } = useRoom();
+  const { state, send } = useRoom();
   const [emotion, setEmotion] = useState("");
   const [situation, setSituation] = useState("");
   const [need, setNeed] = useState("");
@@ -29,6 +29,14 @@ export default function StatementScreen() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Share your concern</h1>
         <p className="text-gray-500 dark:text-gray-400">Use &quot;I&quot; statements to express how you feel</p>
       </div>
+
+      {state?.data?.confirmResult === "not-quite" && !!state?.data?.paraphrase && (
+        <div className="bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-4">
+          <p className="text-xs text-amber-700 dark:text-amber-400 font-medium mb-1">Your partner heard:</p>
+          <p className="text-sm text-amber-900 dark:text-amber-200 italic">&quot;{state.data.paraphrase as string}&quot;</p>
+          <p className="text-xs text-amber-600 dark:text-amber-500 mt-2">Try rephrasing your concern so they can reflect it back more accurately.</p>
+        </div>
+      )}
 
       <div className="space-y-5 flex-1">
         <div>

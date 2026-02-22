@@ -22,12 +22,12 @@ export default function ValidateScreen({ partnerText }: { partnerText: string })
   return (
     <div className="flex flex-col min-h-screen px-6 py-10">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Listen and validate</h1>
-        <p className="text-gray-500">Your partner shared what&apos;s on their mind</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Listen and validate</h1>
+        <p className="text-gray-500 dark:text-gray-400">Your partner shared what&apos;s on their mind</p>
       </div>
 
-      <div className="bg-violet-50 border border-violet-100 rounded-2xl p-5 mb-6">
-        <p className="text-gray-900">&quot;{partnerText}&quot;</p>
+      <div className="bg-violet-50 dark:bg-violet-950 border border-violet-100 dark:border-violet-900 rounded-2xl p-5 mb-6">
+        <p className="text-gray-900 dark:text-gray-100">&quot;{partnerText}&quot;</p>
       </div>
 
       <div className="space-y-2 mb-4">
@@ -38,7 +38,7 @@ export default function ValidateScreen({ partnerText }: { partnerText: string })
             className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all ${
               selected === prompt
                 ? "bg-violet-600 text-white"
-                : "bg-violet-50 text-violet-700 hover:bg-violet-100"
+                : "bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900"
             }`}
           >
             {prompt}
@@ -49,7 +49,7 @@ export default function ValidateScreen({ partnerText }: { partnerText: string })
           className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all ${
             selected === "__custom"
               ? "bg-violet-600 text-white"
-              : "bg-violet-50 text-violet-700 hover:bg-violet-100"
+              : "bg-violet-50 dark:bg-violet-950 text-violet-700 dark:text-violet-300 hover:bg-violet-100 dark:hover:bg-violet-900"
           }`}
         >
           Write my own response...
@@ -62,6 +62,7 @@ export default function ValidateScreen({ partnerText }: { partnerText: string })
           value={custom}
           onChange={(e) => setCustom(e.target.value)}
           rows={3}
+          maxLength={300}
         />
       )}
 

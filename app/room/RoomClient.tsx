@@ -1,10 +1,9 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { use } from "react";
 import RoomProvider, { useRoom } from "@/components/RoomProvider";
 import type { Role, Mode } from "@/lib/types";
-import { MODE_CONFIG } from "@/lib/constants";
+import { MODE_CONFIG, WAITING_TIPS } from "@/lib/constants";
 import ProgressDots from "@/components/ui/ProgressDots";
 import ScreenTransition from "@/components/ui/ScreenTransition";
 
@@ -43,9 +42,9 @@ import TriggersScreen from "@/components/screens/repair/TriggersScreen";
 import ResponsibilityScreen from "@/components/screens/repair/ResponsibilityScreen";
 import PlanScreen from "@/components/screens/repair/PlanScreen";
 
-export default function RoomPage({ params }: { params: Promise<{ code: string }> }) {
-  const { code } = use(params);
+export default function RoomClient() {
   const searchParams = useSearchParams();
+  const code = searchParams.get("code") || "";
   const role = (searchParams.get("role") as Role) || "speaker";
 
   return (
@@ -140,19 +139,19 @@ function renderCheckIn(step: string, role: string, data: Record<string, unknown>
     case "share-a":
       return role === "speaker"
         ? <CheckInShareScreen />
-        : <WaitingForPartner message="Your partner is sharing what's on their mind..." />;
+        : <WaitingForPartner message="Your partner is sharing what's on their mind..." tip={WAITING_TIPS["check-in:share-a:listener"]} />;
     case "validate-a":
       return role === "listener"
         ? <CheckInValidateScreen partnerText={data.shareA as string} />
-        : <WaitingForPartner message="Your partner is reflecting on what you shared..." />;
+        : <WaitingForPartner message="Your partner is reflecting on what you shared..." tip={WAITING_TIPS["check-in:validate-a:speaker"]} />;
     case "share-b":
       return role === "listener"
         ? <CheckInShareScreen />
-        : <WaitingForPartner message="Your partner is sharing what's on their mind..." />;
+        : <WaitingForPartner message="Your partner is sharing what's on their mind..." tip={WAITING_TIPS["check-in:share-b:speaker"]} />;
     case "validate-b":
       return role === "speaker"
         ? <CheckInValidateScreen partnerText={data.shareB as string} />
-        : <WaitingForPartner message="Your partner is reflecting on what you shared..." />;
+        : <WaitingForPartner message="Your partner is reflecting on what you shared..." tip={WAITING_TIPS["check-in:validate-b:listener"]} />;
     default:
       return <ErrorScreen message="Unknown step" />;
   }
@@ -164,15 +163,15 @@ function renderAppreciate(step: string, role: string, data: Record<string, unkno
     case "appreciate-a":
       return role === "speaker"
         ? <AppreciateScreen />
-        : <WaitingForPartner message="Your partner is writing an appreciation..." />;
+        : <WaitingForPartner message="Your partner is writing an appreciation..." tip={WAITING_TIPS["appreciate:appreciate-a:listener"]} />;
     case "acknowledge-a":
       return role === "listener"
         ? <AcknowledgeScreen appreciation={data.appreciateA as { action: string; feeling: string }} />
-        : <WaitingForPartner message="Your partner is reading your appreciation..." />;
+        : <WaitingForPartner message="Your partner is reading your appreciation..." tip={WAITING_TIPS["appreciate:acknowledge-a:speaker"]} />;
     case "appreciate-b":
       return role === "listener"
         ? <AppreciateScreen />
-        : <WaitingForPartner message="Your partner is writing an appreciation..." />;
+        : <WaitingForPartner message="Your partner is writing an appreciation..." tip={WAITING_TIPS["appreciate:appreciate-b:speaker"]} />;
     case "acknowledge-b":
       return role === "speaker"
         ? <AcknowledgeScreen appreciation={data.appreciateB as { action: string; feeling: string }} />
@@ -188,15 +187,15 @@ function renderRaiseConcern(step: string, role: string, data: Record<string, unk
     case "statement":
       return role === "speaker"
         ? <StatementScreen />
-        : <WaitingForPartner message="Your partner is sharing a concern..." />;
+        : <WaitingForPartner message="Your partner is sharing a concern..." tip={WAITING_TIPS["raise-concern:statement:listener"]} />;
     case "paraphrase":
       return role === "listener"
         ? <ParaphraseScreen />
-        : <WaitingForPartner message="Your partner is reflecting on your concern..." />;
+        : <WaitingForPartner message="Your partner is reflecting on your concern..." tip={WAITING_TIPS["raise-concern:paraphrase:speaker"]} />;
     case "confirm":
       return role === "speaker"
         ? <ConfirmScreen />
-        : <WaitingForPartner message="Your partner is checking your paraphrase..." />;
+        : <WaitingForPartner message="Your partner is checking your paraphrase..." tip={WAITING_TIPS["raise-concern:confirm:listener"]} />;
     default:
       return <ErrorScreen message="Unknown step" />;
   }
@@ -208,7 +207,7 @@ function renderWorkThroughIt(step: string, role: string, data: Record<string, un
     case "speak-a":
       return role === "speaker"
         ? <SpeakScreen />
-        : <WaitingForPartner message="Your partner is sharing their perspective..." />;
+        : <WaitingForPartner message="Your partner is sharing their perspective..." tip={WAITING_TIPS["work-through-it:speak-a:listener"]} />;
     case "mirror-a":
       if (role === "listener") {
         return <MirrorScreen partnerText={data.speakA as string} mirror={data.mirrorA as string | null} confirmed={data.mirrorAConfirmed as boolean | null} />;
@@ -216,11 +215,11 @@ function renderWorkThroughIt(step: string, role: string, data: Record<string, un
       if (data.mirrorA && data.mirrorAConfirmed === null) {
         return <MirrorScreen partnerText={data.speakA as string} mirror={data.mirrorA as string} confirmed={null} />;
       }
-      return <WaitingForPartner message="Your partner is mirroring what you said..." />;
+      return <WaitingForPartner message="Your partner is mirroring what you said..." tip={WAITING_TIPS["work-through-it:mirror-a:speaker"]} />;
     case "validate-a":
       return role === "listener"
         ? <WTIValidateScreen partnerText={data.speakA as string} />
-        : <WaitingForPartner message="Your partner is validating your perspective..." />;
+        : <WaitingForPartner message="Your partner is validating your perspective..." tip={WAITING_TIPS["work-through-it:validate-a:speaker"]} />;
     case "empathize-a":
       if (role === "listener" && !data.empathizeA) {
         return <EmpathizeScreen empathy={null} confirmed={data.empathizeAConfirmed as boolean | null} />;
@@ -231,11 +230,11 @@ function renderWorkThroughIt(step: string, role: string, data: Record<string, un
       if (role === "listener" && data.empathizeAConfirmed === false) {
         return <EmpathizeScreen empathy={null} confirmed={false} />;
       }
-      return <WaitingForPartner message="Your partner is empathizing..." />;
+      return <WaitingForPartner message="Your partner is empathizing..." tip={WAITING_TIPS["work-through-it:empathize-a:speaker"]} />;
     case "speak-b":
       return role === "listener"
         ? <SpeakScreen />
-        : <WaitingForPartner message="Your partner is sharing their perspective..." />;
+        : <WaitingForPartner message="Your partner is sharing their perspective..." tip={WAITING_TIPS["work-through-it:speak-b:speaker"]} />;
     case "mirror-b":
       if (role === "speaker") {
         return <MirrorScreen partnerText={data.speakB as string} mirror={data.mirrorB as string | null} confirmed={data.mirrorBConfirmed as boolean | null} />;
@@ -272,15 +271,15 @@ function renderRepair(step: string, role: string, data: Record<string, unknown>)
     case "realities-a":
       return role === "speaker"
         ? <RealitiesScreen isPersonA={true} />
-        : <WaitingForPartner message="Your partner is sharing their perspective..." />;
+        : <WaitingForPartner message="Your partner is sharing their perspective..." tip={WAITING_TIPS["repair:realities-a:listener"]} />;
     case "realities-b":
       return role === "listener"
         ? <RealitiesScreen isPersonA={false} />
-        : <WaitingForPartner message="Your partner is reflecting on your perspective..." />;
+        : <WaitingForPartner message="Your partner is reflecting on your perspective..." tip={WAITING_TIPS["repair:realities-b:speaker"]} />;
     case "triggers-a":
       return role === "speaker"
         ? <TriggersScreen />
-        : <WaitingForPartner message="Your partner is sharing what triggered them..." />;
+        : <WaitingForPartner message="Your partner is sharing what triggered them..." tip={WAITING_TIPS["repair:triggers-a:listener"]} />;
     case "triggers-b":
       return role === "listener"
         ? <TriggersScreen />
@@ -288,7 +287,7 @@ function renderRepair(step: string, role: string, data: Record<string, unknown>)
     case "responsibility-a":
       return role === "speaker"
         ? <ResponsibilityScreen />
-        : <WaitingForPartner message="Your partner is reflecting on their responsibility..." />;
+        : <WaitingForPartner message="Your partner is reflecting on their responsibility..." tip={WAITING_TIPS["repair:responsibility-a:listener"]} />;
     case "responsibility-b":
       return role === "listener"
         ? <ResponsibilityScreen />

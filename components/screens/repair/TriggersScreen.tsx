@@ -20,8 +20,8 @@ export default function TriggersScreen() {
   return (
     <div className="flex flex-col min-h-screen px-6 py-10">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">What triggered you?</h1>
-        <p className="text-gray-500">Understanding triggers helps prevent future escalation</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">What triggered you?</h1>
+        <p className="text-gray-500 dark:text-gray-400">Understanding triggers helps prevent future escalation</p>
       </div>
 
       <div className="space-y-5 flex-1">
@@ -31,6 +31,7 @@ export default function TriggersScreen() {
           value={trigger}
           onChange={(e) => setTrigger(e.target.value)}
           rows={3}
+          maxLength={300}
         />
 
         <TextArea
@@ -39,6 +40,7 @@ export default function TriggersScreen() {
           value={story}
           onChange={(e) => setStory(e.target.value)}
           rows={3}
+          maxLength={300}
         />
       </div>
 

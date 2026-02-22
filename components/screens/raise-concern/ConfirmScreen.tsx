@@ -11,12 +11,12 @@ export default function ConfirmScreen() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Does this feel accurate?</h1>
-        <p className="text-gray-500">Your partner reflected back:</p>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Does this feel accurate?</h1>
+        <p className="text-gray-500 dark:text-gray-400">Your partner reflected back:</p>
       </div>
 
-      <div className="bg-violet-50 border border-violet-100 rounded-2xl p-5 mb-8 max-w-sm w-full">
-        <p className="text-gray-900 italic">&quot;{paraphrase}&quot;</p>
+      <div className="bg-violet-50 dark:bg-violet-950 border border-violet-100 dark:border-violet-900 rounded-2xl p-5 mb-8 max-w-sm w-full">
+        <p className="text-gray-900 dark:text-gray-100 italic">&quot;{paraphrase}&quot;</p>
       </div>
 
       <div className="flex flex-col gap-3 w-full max-w-xs">

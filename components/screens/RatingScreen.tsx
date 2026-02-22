@@ -14,7 +14,8 @@ const RATING_OPTIONS: { value: Rating; label: string }[] = [
 export default function RatingScreen() {
   const { state, yourRole, send } = useRoom();
 
-  const question = state?.mode ? MODE_CONFIG[state.mode].ratingQuestion : "How do you feel?";
+  const config = state?.mode ? MODE_CONFIG[state.mode] : null;
+  const question = config ? config.ratingQuestion : "How do you feel?";
 
   // Check if we already submitted
   const myRating = yourRole === "speaker" ? state?.ratings.speaker : state?.ratings.listener;
@@ -22,11 +23,14 @@ export default function RatingScreen() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">{question}</h1>
+      {config && (
+        <p className="text-sm text-gray-400 dark:text-gray-500 mb-3">{config.icon} {config.name}</p>
+      )}
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">{question}</h1>
 
       {submitted ? (
         <div>
-          <p className="text-gray-500 mb-2">Waiting for your partner to respond...</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-2">Waiting for your partner to respond...</p>
           <div className="w-3 h-3 rounded-full bg-violet-400 animate-pulse mx-auto" />
         </div>
       ) : (

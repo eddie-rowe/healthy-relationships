@@ -14,7 +14,7 @@ export default function ProgressDots({ currentStep, totalSteps }: ProgressDotsPr
   if (currentIndex < 0) return null;
 
   return (
-    <div className="flex items-center justify-center gap-2 py-4">
+    <div className="flex items-center justify-center gap-2 py-4" role="status" aria-label={`Step ${currentIndex + 1} of ${sessionSteps.length}`}>
       {sessionSteps.map((step, i) => {
         const isDone = i < currentIndex;
         const isCurrent = i === currentIndex;

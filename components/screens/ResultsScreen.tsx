@@ -49,7 +49,7 @@ function buildSummaryText(mode: string, data: Record<string, unknown>): string {
 }
 
 export default function ResultsScreen() {
-  const { state, send } = useRoom();
+  const { state, yourRole, send } = useRoom();
   const [copied, setCopied] = useState(false);
   if (!state?.mode) return null;
 
@@ -136,11 +136,11 @@ export default function ResultsScreen() {
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">How we feel</h3>
             <div className="flex gap-4">
               <div>
-                <span className="text-xs text-gray-400 dark:text-gray-500 block mb-1">Person A</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 block mb-1">{yourRole === "speaker" ? "You" : "Your partner"}</span>
                 <RatingBadge rating={ratings.speaker} />
               </div>
               <div>
-                <span className="text-xs text-gray-400 dark:text-gray-500 block mb-1">Person B</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 block mb-1">{yourRole === "listener" ? "You" : "Your partner"}</span>
                 <RatingBadge rating={ratings.listener} />
               </div>
             </div>

@@ -10,11 +10,11 @@ export default function AcknowledgeScreen({ appreciation }: { appreciation: { ac
     <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
       <div className="mb-8">
         <span className="text-4xl block mb-4">💛</span>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Your partner appreciates you</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Your partner appreciates you</h1>
       </div>
 
-      <div className="bg-violet-50 border border-violet-100 rounded-2xl p-6 mb-8 max-w-sm w-full">
-        <p className="text-gray-900 text-lg">
+      <div className="bg-violet-50 dark:bg-violet-950 border border-violet-100 dark:border-violet-900 rounded-2xl p-6 mb-8 max-w-sm w-full">
+        <p className="text-gray-900 dark:text-gray-100 text-lg">
           &quot;I noticed when you <strong>{appreciation.action}</strong> and it made me feel <strong>{appreciation.feeling}</strong>.&quot;
         </p>
       </div>

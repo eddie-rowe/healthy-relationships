@@ -14,12 +14,12 @@ export default function Home() {
 
   const handleCreate = () => {
     const code = generateRoomCode();
-    router.push(`/room/${code}?role=speaker`);
+    router.push(`/room?code=${code}&role=speaker`);
   };
 
   const handleJoin = () => {
     if (!joinCode.trim()) return;
-    router.push(`/room/${joinCode.trim().toUpperCase()}?role=listener`);
+    router.push(`/room?code=${joinCode.trim().toUpperCase()}&role=listener`);
   };
 
   return (

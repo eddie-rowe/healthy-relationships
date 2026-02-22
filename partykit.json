@@ -1,5 +1,12 @@
 {
   "name": "healthy-relationships",
   "main": "party/index.ts",
-  "compatibilityDate": "2024-12-01"
+  "compatibilityDate": "2024-12-01",
+  "build": {
+    "command": "NEXT_PUBLIC_PARTYKIT_HOST=healthy-relationships.eddie-rowe.partykit.dev npm run build"
+  },
+  "serve": {
+    "path": "out",
+    "singlePageApp": true
+  }
 }
