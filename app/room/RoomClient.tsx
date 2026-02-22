@@ -68,7 +68,7 @@ function ScreenRouter({ code }: { code: string }) {
   if (step === "waiting") return <ScreenTransition stepKey="waiting"><WaitingScreen code={code} /></ScreenTransition>;
   if (step === "mode-select") {
     if (yourRole === "speaker") return <ScreenTransition stepKey="mode-select"><ModePickerScreen /></ScreenTransition>;
-    return <ScreenTransition stepKey="mode-select"><WaitingForPartner message="Your partner is choosing a mode..." /></ScreenTransition>;
+    return <ScreenTransition stepKey="mode-select"><WaitingForPartner message="Your partner is choosing a mode..." showNameEntry /></ScreenTransition>;
   }
   if (step === "explainer") {
     return (

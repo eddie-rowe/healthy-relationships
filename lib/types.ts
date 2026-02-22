@@ -20,6 +20,7 @@ export interface RoomState {
   listenerId: string | null;
   data: Record<string, unknown>;
   ratings: { speaker: Rating | null; listener: Rating | null };
+  names: { speaker: string | null; listener: string | null };
 }
 
 // Server -> Client messages
@@ -65,4 +66,9 @@ export interface ResetRoomMessage {
   type: "reset-room";
 }
 
-export type ClientMessage = JoinMessage | SetModeMessage | SubmitStepMessage | SubmitRatingMessage | StartSessionMessage | ResetRoomMessage;
+export interface SetNameMessage {
+  type: "set-name";
+  name: string;
+}
+
+export type ClientMessage = JoinMessage | SetModeMessage | SubmitStepMessage | SubmitRatingMessage | StartSessionMessage | ResetRoomMessage | SetNameMessage;

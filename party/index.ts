@@ -8,6 +8,7 @@ interface RoomState {
   listenerId: string | null;
   data: Record<string, unknown>;
   ratings: { speaker: Rating | null; listener: Rating | null };
+  names: { speaker: string | null; listener: string | null };
   sessionId: string;
   sessionStartedAt: number | null;
   stepStartedAt: number | null;
@@ -33,6 +34,7 @@ function initialState(): RoomState {
     listenerId: null,
     data: {},
     ratings: { speaker: null, listener: null },
+    names: { speaker: null, listener: null },
     sessionId: randomSessionId(),
     sessionStartedAt: null,
     stepStartedAt: null,
@@ -44,6 +46,20 @@ export default class Server implements Party.Server {
 
   constructor(readonly room: Party.Room) {
     this.state = initialState();
+  }
+
+  async onStart() {
+    const saved = await this.room.storage.get<RoomState>("state");
+    if (saved) {
+      // Merge saved state onto defaults so new fields (e.g. names) are always present.
+      // Connection IDs are ephemeral per WebSocket — clear them so reconnecting
+      // clients get assigned their roles fresh on the next onConnect.
+      this.state = { ...initialState(), ...saved, speakerId: null, listenerId: null };
+    }
+  }
+
+  async saveState() {
+    await this.room.storage.put("state", this.state);
   }
 
   getConnectionCount(): number {
@@ -63,6 +79,7 @@ export default class Server implements Party.Server {
         yourRole: role,
       }));
     }
+    void this.saveState();
   }
 
   advanceStep() {
@@ -145,11 +162,8 @@ export default class Server implements Party.Server {
       }
     }
 
-    if (!this.state.speakerId && !this.state.listenerId) {
-      this.state = initialState();
-      return;
-    }
-
+    // Don't reset state when both disconnect — persist it so they can rejoin
+    // and pick up exactly where they left off. State is saved by broadcastState().
     this.broadcastState();
   }
 
@@ -179,6 +193,9 @@ export default class Server implements Party.Server {
         break;
       case "reset-room":
         this.handleResetRoom();
+        break;
+      case "set-name":
+        this.handleSetName(data.name, sender);
         break;
     }
   }
@@ -225,11 +242,24 @@ export default class Server implements Party.Server {
     if (!this.state.mode) return;
     const speakerId = this.state.speakerId;
     const listenerId = this.state.listenerId;
+    const names = this.state.names;
     this.state = initialState();
     this.state.speakerId = speakerId;
     this.state.listenerId = listenerId;
+    this.state.names = names; // keep names across resets
     if (speakerId && listenerId) {
       this.state.step = "mode-select";
+    }
+    this.broadcastState();
+  }
+
+  handleSetName(name: string, sender: Party.Connection) {
+    const trimmed = name.trim().slice(0, 50);
+    if (!trimmed) return;
+    if (sender.id === this.state.speakerId) {
+      this.state.names.speaker = trimmed;
+    } else if (sender.id === this.state.listenerId) {
+      this.state.names.listener = trimmed;
     }
     this.broadcastState();
   }

@@ -19,31 +19,36 @@ function RatingBadge({ rating }: { rating: string | null }) {
   );
 }
 
-function buildSummaryText(mode: string, data: Record<string, unknown>): string {
+function buildSummaryText(
+  mode: string,
+  data: Record<string, unknown>,
+  speakerName: string,
+  listenerName: string,
+): string {
   const lines: string[] = [];
   if (mode === "raise-concern") {
     lines.push(`Concern: I feel ${data.emotion} when ${data.situation}. What I need is ${data.need}.`);
     if (data.paraphrase) lines.push(`Paraphrase: ${data.paraphrase}`);
   } else if (mode === "check-in") {
-    if (data.shareA) lines.push(`Person A shared: ${data.shareA}`);
-    if (data.validateA) lines.push(`Person B responded: ${data.validateA}`);
-    if (data.shareB) lines.push(`Person B shared: ${data.shareB}`);
-    if (data.validateB) lines.push(`Person A responded: ${data.validateB}`);
+    if (data.shareA) lines.push(`${speakerName} shared: ${data.shareA}`);
+    if (data.validateA) lines.push(`${listenerName} responded: ${data.validateA}`);
+    if (data.shareB) lines.push(`${listenerName} shared: ${data.shareB}`);
+    if (data.validateB) lines.push(`${speakerName} responded: ${data.validateB}`);
   } else if (mode === "appreciate") {
     const a = data.appreciateA as Record<string, string> | undefined;
     const b = data.appreciateB as Record<string, string> | undefined;
-    if (a) lines.push(`Person A appreciated: I noticed when you ${a.action} and it made me feel ${a.feeling}.`);
-    if (b) lines.push(`Person B appreciated: I noticed when you ${b.action} and it made me feel ${b.feeling}.`);
+    if (a) lines.push(`${speakerName} appreciated: I noticed when you ${a.action} and it made me feel ${a.feeling}.`);
+    if (b) lines.push(`${listenerName} appreciated: I noticed when you ${b.action} and it made me feel ${b.feeling}.`);
   } else if (mode === "work-through-it") {
-    if (data.speakA) lines.push(`Person A shared: ${data.speakA}`);
-    if (data.mirrorA) lines.push(`Person B mirrored: ${data.mirrorA}`);
-    if (data.speakB) lines.push(`Person B shared: ${data.speakB}`);
-    if (data.mirrorB) lines.push(`Person A mirrored: ${data.mirrorB}`);
+    if (data.speakA) lines.push(`${speakerName} shared: ${data.speakA}`);
+    if (data.mirrorA) lines.push(`${listenerName} mirrored: ${data.mirrorA}`);
+    if (data.speakB) lines.push(`${listenerName} shared: ${data.speakB}`);
+    if (data.mirrorB) lines.push(`${speakerName} mirrored: ${data.mirrorB}`);
   } else if (mode === "repair") {
-    if (data.responsibilityA) lines.push(`Person A: ${data.responsibilityA}`);
-    if (data.responsibilityB) lines.push(`Person B: ${data.responsibilityB}`);
-    if (data.planSpeaker) lines.push(`Person A will: ${data.planSpeaker}`);
-    if (data.planListener) lines.push(`Person B will: ${data.planListener}`);
+    if (data.responsibilityA) lines.push(`${speakerName}: ${data.responsibilityA}`);
+    if (data.responsibilityB) lines.push(`${listenerName}: ${data.responsibilityB}`);
+    if (data.planSpeaker) lines.push(`${speakerName} will: ${data.planSpeaker}`);
+    if (data.planListener) lines.push(`${listenerName} will: ${data.planListener}`);
   }
   return lines.join("\n");
 }
@@ -55,11 +60,13 @@ export default function ResultsScreen() {
 
   const config = MODE_CONFIG[state.mode];
   const { data, ratings } = state;
+  const speakerName = state.names?.speaker || "Person A";
+  const listenerName = state.names?.listener || "Person B";
 
   const suggestion = getNextModeSuggestion(state.mode, ratings);
 
   const handleCopy = async () => {
-    const text = buildSummaryText(state.mode!, data);
+    const text = buildSummaryText(state.mode!, data, speakerName, listenerName);
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -88,10 +95,10 @@ export default function ResultsScreen() {
 
         {state.mode === "check-in" && (
           <>
-            {data.shareA && <SummaryCard label="Person A shared" text={data.shareA as string} />}
-            {data.validateA && <SummaryCard label="Person B responded" text={data.validateA as string} />}
-            {data.shareB && <SummaryCard label="Person B shared" text={data.shareB as string} />}
-            {data.validateB && <SummaryCard label="Person A responded" text={data.validateB as string} />}
+            {data.shareA && <SummaryCard label={`${speakerName} shared`} text={data.shareA as string} />}
+            {data.validateA && <SummaryCard label={`${listenerName} responded`} text={data.validateA as string} />}
+            {data.shareB && <SummaryCard label={`${listenerName} shared`} text={data.shareB as string} />}
+            {data.validateB && <SummaryCard label={`${speakerName} responded`} text={data.validateB as string} />}
           </>
         )}
 
@@ -99,13 +106,13 @@ export default function ResultsScreen() {
           <>
             {data.appreciateA && (
               <SummaryCard
-                label="Person A appreciated"
+                label={`${speakerName} appreciated`}
                 text={`I noticed when you ${(data.appreciateA as Record<string, string>).action} and it made me feel ${(data.appreciateA as Record<string, string>).feeling}`}
               />
             )}
             {data.appreciateB && (
               <SummaryCard
-                label="Person B appreciated"
+                label={`${listenerName} appreciated`}
                 text={`I noticed when you ${(data.appreciateB as Record<string, string>).action} and it made me feel ${(data.appreciateB as Record<string, string>).feeling}`}
               />
             )}
@@ -114,19 +121,19 @@ export default function ResultsScreen() {
 
         {state.mode === "work-through-it" && (
           <>
-            {data.speakA && <SummaryCard label="Person A shared" text={data.speakA as string} />}
-            {data.mirrorA && <SummaryCard label="Person B mirrored" text={data.mirrorA as string} />}
-            {data.speakB && <SummaryCard label="Person B shared" text={data.speakB as string} />}
-            {data.mirrorB && <SummaryCard label="Person A mirrored" text={data.mirrorB as string} />}
+            {data.speakA && <SummaryCard label={`${speakerName} shared`} text={data.speakA as string} />}
+            {data.mirrorA && <SummaryCard label={`${listenerName} mirrored`} text={data.mirrorA as string} />}
+            {data.speakB && <SummaryCard label={`${listenerName} shared`} text={data.speakB as string} />}
+            {data.mirrorB && <SummaryCard label={`${speakerName} mirrored`} text={data.mirrorB as string} />}
           </>
         )}
 
         {state.mode === "repair" && (
           <>
-            {data.responsibilityA && <SummaryCard label="Person A takes responsibility" text={data.responsibilityA as string} />}
-            {data.responsibilityB && <SummaryCard label="Person B takes responsibility" text={data.responsibilityB as string} />}
-            {data.planSpeaker && <SummaryCard label="Person A will" text={data.planSpeaker as string} />}
-            {data.planListener && <SummaryCard label="Person B will" text={data.planListener as string} />}
+            {data.responsibilityA && <SummaryCard label={`${speakerName} takes responsibility`} text={data.responsibilityA as string} />}
+            {data.responsibilityB && <SummaryCard label={`${listenerName} takes responsibility`} text={data.responsibilityB as string} />}
+            {data.planSpeaker && <SummaryCard label={`${speakerName} will`} text={data.planSpeaker as string} />}
+            {data.planListener && <SummaryCard label={`${listenerName} will`} text={data.planListener as string} />}
           </>
         )}
 
@@ -136,11 +143,15 @@ export default function ResultsScreen() {
             <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">How we feel</h3>
             <div className="flex gap-4">
               <div>
-                <span className="text-xs text-gray-400 dark:text-gray-500 block mb-1">{yourRole === "speaker" ? "You" : "Your partner"}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 block mb-1">
+                  {yourRole === "speaker" ? "You" : speakerName}
+                </span>
                 <RatingBadge rating={ratings.speaker} />
               </div>
               <div>
-                <span className="text-xs text-gray-400 dark:text-gray-500 block mb-1">{yourRole === "listener" ? "You" : "Your partner"}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 block mb-1">
+                  {yourRole === "listener" ? "You" : listenerName}
+                </span>
                 <RatingBadge rating={ratings.listener} />
               </div>
             </div>

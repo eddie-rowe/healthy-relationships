@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRoom } from "@/components/RoomProvider";
 
 export default function WaitingScreen({ code }: { code: string }) {
+  const { state, send } = useRoom();
   const [copied, setCopied] = useState(false);
+  const [name, setName] = useState("");
 
   const copyCode = async () => {
     try {
@@ -13,6 +16,14 @@ export default function WaitingScreen({ code }: { code: string }) {
     } catch {
       // fallback: do nothing
     }
+  };
+
+  const savedName = state?.names?.speaker;
+
+  const handleSaveName = () => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    send({ type: "set-name", name: trimmed });
   };
 
   return (
@@ -34,9 +45,37 @@ export default function WaitingScreen({ code }: { code: string }) {
         </span>
       </button>
 
-      <p className="text-sm text-gray-400 dark:text-gray-500">
+      <p className="text-sm text-gray-400 dark:text-gray-500 mb-10">
         {copied ? "Copied!" : "Tap to copy"}
       </p>
+
+      <div className="w-full max-w-xs text-left">
+        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">
+          Your name <span className="text-gray-400 dark:text-gray-500 font-normal">(optional)</span>
+        </label>
+        {savedName ? (
+          <p className="text-sm text-violet-600 dark:text-violet-400 font-medium">✓ {savedName}</p>
+        ) : (
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
+              placeholder="e.g. Alex"
+              maxLength={50}
+              className="flex-1 px-3 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+            />
+            <button
+              onClick={handleSaveName}
+              disabled={!name.trim()}
+              className="px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium disabled:opacity-40 transition-opacity"
+            >
+              Save
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
